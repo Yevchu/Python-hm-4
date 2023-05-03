@@ -10,21 +10,6 @@ HANDLERS = {
     'good bye': goodbye,
     'close': goodbye
 }
-@input_error
-# def parse_input(user_input):
-#     command, *args = user_input.strip().split(' ', 1)
-
-
-
-#     handler = HANDLERS.get(command.lower(), unknown_command)
-    # try:
-    #     handler = HANDLERS[command.lower()]
-    # except KeyError:
-    #     if args:
-    #         command = command + ' ' + args[0]
-    #         args = args[1:]
-    #     handler = HANDLERS.get(command.lower(), unknown_command)
-#     return handler, args
 
 def main():
     while True:
@@ -45,13 +30,6 @@ def main():
             break
         else:
             print(result)
-        # try:
-        #     result = handler(*args)
-        #     if not result:
-        #         break
-        #     print(result)
-        # except TypeError:
-        #     print("Give me a command or command and args")
 
 if __name__ == '__main__':
     main()

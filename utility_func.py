@@ -25,7 +25,6 @@ def goodbye():
 
 @input_error
 def add_user(name, phone):
-    # name, phone = args
     CONTACTS[name] = phone
     return f'User {name} added!'
 
