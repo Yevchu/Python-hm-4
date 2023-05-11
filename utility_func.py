@@ -1,4 +1,5 @@
-CONTACTS = {}
+from classes import AddressBook, Name, Phone, Record
+CONTACTS = AddressBook()
 
 def input_error(func):
     def inner(*args):
@@ -11,6 +12,8 @@ def input_error(func):
             return 'Give me name and phone please'
         except IndexError:
             return 'Enter user name'
+        except TypeError:
+            return 'You missed arguments'
     return inner
 
 def hello_user():
@@ -24,26 +27,39 @@ def goodbye():
     return
 
 @input_error
-def add_user(name, phone):
-    CONTACTS[name] = phone
-    return f'User {name} added!'
+def add_user(name: str, phone: str) -> str:
+    record = Record(Name(name))
+    record.add_phone(Phone(phone))
+    CONTACTS.add_record(record)
+    return f'User {name} is added!'
 
 @input_error
 def change_phone(name, phone):
-    old_phone = CONTACTS[name]
-    CONTACTS[name] = phone
+    record = CONTACTS.data.get(name)
+    if not record:
+        return "Contact not found"
+    old_phone = record.phones[0]
+    new_phone = Phone(phone)
+    record.change_phone(old_phone, new_phone)
     return f'{name}`s old phone number: {old_phone} has been changed to a new one: {phone}'
 
-
-def show_all(_):
+def show_all():
     result = ''
-    for name, phone in CONTACTS.items():
-        result += f'Name: {name}, phone: {phone}\n'
+    if not CONTACTS:
+        return "No contacts found"
+    for name, record in CONTACTS.items():
+        result += f'Name: {name}, phone: {record.phones[0].value}\n'
     return result
 
 def show_phone(name):
-    result = ''
-    for phone in CONTACTS.values():
-        result = f'{name} phone number is: {phone}'
-    return result
+    if name == 'all':
+        return show_all()
+    else:
+        result = ''
+        record = CONTACTS.data[name]
+        if name:
+            result = f'{name} phone number is: {record.phones[0].value}'
+        else:
+            result = f'We dont have {name} in our list'
+        return result
 

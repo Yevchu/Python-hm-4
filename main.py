@@ -1,16 +1,16 @@
-from utility_func import hello_user, add_user, change_phone, show_all, show_phone, unknown_command, input_error, goodbye
+from utility_func import input_error, hello_user, add_user, change_phone, show_phone, unknown_command, input_error, goodbye
 
 HANDLERS = {
     'hello': hello_user,
     'add': add_user,
     'change': change_phone,
-    'show all': show_all,
-    'phone': show_phone,
+    'show': show_phone,
     'exit': goodbye,
     'good bye': goodbye,
     'close': goodbye
 }
 
+@input_error
 def main():
     while True:
         user_input = input('Please enter command or command and args: ')
@@ -21,9 +21,6 @@ def main():
             if args:
                 args = args[0].split(' ')
         else:
-            if HANDLERS.get(command) is None:
-                command = command + ' ' + args[0]
-                handler = HANDLERS.get(command.lower())
             handler = HANDLERS.get(command.lower(),unknown_command(command))
         result = handler(*args)
         if result is None:
