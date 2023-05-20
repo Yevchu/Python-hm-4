@@ -13,7 +13,7 @@ def input_error(func):
         except IndexError:
             return 'Enter user name'
         except TypeError:
-            return 'You missed arguments'
+            return 'Missed arguments'
     return inner
 
 def hello_user():
@@ -24,32 +24,40 @@ def unknown_command(command):
 
 def goodbye():
     print('Good bye!')
-    return
+    return 'exit'
 
 @input_error
 def add_user(name: str, phone: str) -> str:
-    record = Record(Name(name))
-    record.add_phone(Phone(phone))
+    record = Record(Name(name), Phone(phone))
+    if name not in CONTACTS.data:
+        result = f'New user {name} is added!'
+    else:
+        return add_phone(name, phone)
     CONTACTS.add_record(record)
-    return f'User {name} is added!'
+    return result
+
+def add_phone(name: str, phone: str) -> str:
+    record = CONTACTS.get_records(name)
+    record.add_phone(phone)
+    CONTACTS.add_record(record)
+    return f'For user {name} is added a new phone {phone}!'
 
 @input_error
-def change_phone(name, phone):
-    record = CONTACTS.data.get(name)
+def change_phone(name, old_phone, new_phone):  #TODO: є проблема з коректністью роботи функції, на даний момент вона працює але в консоль ми отримаємо прінт + None
+    record = CONTACTS.get_records(name)
     if not record:
         return "Contact not found"
-    old_phone = record.phones[0]
-    new_phone = Phone(phone)
-    record.change_phone(old_phone, new_phone)
-    return f'{name}`s old phone number: {old_phone} has been changed to a new one: {phone}'
+    record.change_phone(old_phone, new_phone)  
+    CONTACTS.add_record(record)
+    # return f'{name}`s old phone number: {old_phone} has been changed to a new one: {new_phone}'
 
-def show_all():
-    result = ''
-    if not CONTACTS:
-        return "No contacts found"
-    for name, record in CONTACTS.items():
-        result += f'Name: {name}, phone: {record.phones[0].value}\n'
-    return result
+def remove_phone(name, phone): # TODO: фукнція працюж не правильно, кінцевий результат залишається без змін, сам рекорд не змінюються, якщо записати рекорд у нову змінну и добавити її в CONTACTS виникає помилка 
+    record = CONTACTS.get_records(name)
+    if not record:
+        return "Contact not found"
+    record.remove_phone(phone)
+    CONTACTS.add_record(record)
+    return f'For {name} phone {phone} is deleted.'
 
 def show_phone(name):
     if name == 'all':
@@ -58,8 +66,13 @@ def show_phone(name):
         result = ''
         record = CONTACTS.data[name]
         if name:
-            result = f'{name} phone number is: {record.phones[0].value}'
+            result = f'{name} phone number is: {record.show()}'
         else:
             result = f'We dont have {name} in our list'
         return result
 
+def show_all():
+    if not CONTACTS:
+        return "No contacts found" 
+    result = CONTACTS.show()
+    return result
