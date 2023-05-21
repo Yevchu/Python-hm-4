@@ -1,4 +1,5 @@
-from classes import AddressBook, Name, Phone, Record
+from datetime import datetime
+from classes import AddressBook, Name, Phone, Record, Birthday
 CONTACTS = AddressBook()
 
 def input_error(func):
@@ -17,22 +18,27 @@ def input_error(func):
     return inner
 
 def hello_user():
-    return 'How can I help you?'
+    print('How can I help you?')
+    return 
 
+@input_error
 def unknown_command(command):
     return f'Unknown command: {command}'
 
 def goodbye():
     print('Good bye!')
-    return 'exit'
+    return
 
 @input_error
-def add_user(name: str, phone: str) -> str:
-    record = Record(Name(name), Phone(phone))
+def add_user(name: str, phone: str = None) -> str:
+    name_rec = Name(name)
+    phone_rec = Phone(phone)
+    phone_rec.value = phone
+    record = Record(name_rec, phone_rec)
     if name not in CONTACTS.data:
         result = f'New user {name} is added!'
     else:
-        return add_phone(name, phone)
+        return add_phone(name, phone_rec)
     CONTACTS.add_record(record)
     return result
 
@@ -43,36 +49,67 @@ def add_phone(name: str, phone: str) -> str:
     return f'For user {name} is added a new phone {phone}!'
 
 @input_error
-def change_phone(name, old_phone, new_phone):  #TODO: є проблема з коректністью роботи функції, на даний момент вона працює але в консоль ми отримаємо прінт + None
-    record = CONTACTS.get_records(name)
+def add_birthday(name: str, birthday: Birthday) -> str:
+    record = CONTACTS.data.get(name)
     if not record:
         return "Contact not found"
-    record.change_phone(old_phone, new_phone)  
-    CONTACTS.add_record(record)
-    # return f'{name}`s old phone number: {old_phone} has been changed to a new one: {new_phone}'
+    try: 
+        bd_date_str = Birthday(birthday)
+        bd_date_str.value = birthday
+        record.set_birthday(bd_date_str)
+        CONTACTS.add_record(record)
+        return f"Added birthday: {bd_date_str.value}"
+    except ValueError:
+        return f"Invalid date format. Please use the format: DD-MM-YYYY. Birthday: {bd_date_str.value}"
 
-def remove_phone(name, phone): # TODO: фукнція працюж не правильно, кінцевий результат залишається без змін, сам рекорд не змінюються, якщо записати рекорд у нову змінну и добавити її в CONTACTS виникає помилка 
+@input_error
+def change_phone(name, old_phone, new_phone):
     record = CONTACTS.get_records(name)
     if not record:
         return "Contact not found"
-    record.remove_phone(phone)
-    CONTACTS.add_record(record)
-    return f'For {name} phone {phone} is deleted.'
+    result = record.change_phone(old_phone, new_phone)  
+    return f'{name}`s {result}'
+
+def remove_phone(name, phone): 
+    record = CONTACTS.get_records(name)
+    if not record:
+        return "Contact not found"
+    result = record.remove_phone(phone)
+    return f'For {name} {result}'
 
 def show_phone(name):
     if name == 'all':
         return show_all()
     else:
         result = ''
-        record = CONTACTS.data[name]
-        if name:
-            result = f'{name} phone number is: {record.show()}'
+        record = CONTACTS.data.get(name)
+        birthday = record.show_birthday()
+        if record:
+            result = f'{name} phone number is: {record.show_phone()}, {birthday} , next birthday in: {days_to_birthday(name)} days'
         else:
             result = f'We dont have {name} in our list'
-        return result
+    return result
 
 def show_all():
-    if not CONTACTS:
+    record = CONTACTS.data
+    if not record:
         return "No contacts found" 
-    result = CONTACTS.show()
+    result = ''
+    for name, phone in record.items():
+        birthday = phone.show_birthday()
+        result += f'{name} phone number is: {phone.show_phone()}, {birthday}, next birthday in: {days_to_birthday(name)} days\n'
+    return result
+
+def days_to_birthday(name: str):
+    record = CONTACTS.data.get(name)
+    result = record.days_to_birthday()
+    return result
+
+@input_error
+def paginate(page_size: int) -> str: #TODO не працює 
+    result = ''
+    for page in CONTACTS.paginate(page_size):
+        for name, record in page:
+            result += f'{name}: {record.value}\n'
+        result += '---\n'
     return result
