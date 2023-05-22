@@ -1,5 +1,4 @@
-from datetime import datetime
-from classes import AddressBook, Name, Phone, Record, Birthday
+from classes import AddressBook, Name, Phone, Record, Birthday, Iterator
 CONTACTS = AddressBook()
 
 def input_error(func):
@@ -106,10 +105,11 @@ def days_to_birthday(name: str):
     return result
 
 @input_error
-def paginate(page_size: int) -> str: #TODO не працює 
+def paginate(page_size: int) -> str:
     result = ''
-    for page in CONTACTS.paginate(page_size):
+    page_size_int = int(page_size)
+    for page in CONTACTS.paginate(page_size_int):
         for name, record in page:
-            result += f'{name}: {record.value}\n'
-        result += '---\n'
+            result += f"{name}: {record.show_phone()}, {record.show_birthday()}\n"
+        result += "---\n" 
     return result

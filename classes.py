@@ -141,10 +141,13 @@ class AddressBook(UserDict):
     def __str__(self) -> str:
         print({self.data})
 
-    def paginate(self, page_size):
+    def __iter__(self):
+        return Iterator(list(self.data.values()))
+
+    def paginate(self, page_size: int):
         records = list(self.data.values())
         total_records = len(records)
-        num_pages = (total_records + page_size - 1) / page_size
+        num_pages = (total_records + page_size - 1) // page_size
 
         for page in range(num_pages):
             start_index = page * page_size
