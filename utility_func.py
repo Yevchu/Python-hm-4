@@ -1,4 +1,7 @@
-from classes import AddressBook, Name, Phone, Record, Birthday, Iterator
+import copy
+import pickle
+from classes import AddressBook, Name, Phone, Record, Birthday
+
 CONTACTS = AddressBook()
 
 def input_error(func):
@@ -113,3 +116,28 @@ def paginate(page_size: int) -> str:
             result += f"{name}: {record.show_phone()}, {record.show_birthday()}\n"
         result += "---\n" 
     return result
+
+def search_contact_book(query: str) -> str:
+    result = ''
+    try:
+        int(query)
+        for name, record in CONTACTS.data.items():
+            if query in CONTACTS.data.get(name):
+                result += f'User: {name}, {record}\n'
+    except ValueError:
+        get_user = list(filter(lambda x: query.lower() in x.lower(), CONTACTS.data.keys()))
+        for name in get_user:
+            user_info = CONTACTS.data.get(name)
+            result += f'User: {name}, {user_info.show_phone()}, {user_info.show_birthday()}\n'
+    return result
+
+def save():
+    with open('Contacts.txt', 'wb') as file:
+        pickle.dump(CONTACTS.data, file)
+    return 'Contacts list saved!'
+
+def load():
+    with open('Contacts.txt', 'rb') as file:
+        CONTACTS.data = pickle.load(file)
+    return 'Contacts list loaded!'
+        
