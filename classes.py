@@ -4,8 +4,7 @@ from datetime import datetime, date
 
 class Field:
     def __init__(self, value) -> None:
-        self.__value = None
-        self.__value = value
+        self.value = value
 
     @property
     def value(self):
@@ -28,10 +27,13 @@ class Phone(Field):
         super().__init__(value)
  
     def validator(self, new_value):
-        if not match(r'^\+38\d{10}$', new_value):
-            print("Phone number should be in the format +380XXXXXXXXX")
-            raise ValueError
-
+        if isinstance(new_value, str):
+            if not match(r'^\+38\d{10}$', new_value):
+                print("Phone number should be in the format +380XXXXXXXXX")
+                raise ValueError("Phone number should be in the format +380XXXXXXXXX")
+        else:
+            raise ValueError('value must be str not int')
+            
     def __repr__(self) -> str:
         return f"{self.value}"
     
