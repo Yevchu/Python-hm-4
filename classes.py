@@ -14,7 +14,11 @@ class Field:
     def value(self, new_value):
         self.validator(new_value)
         self.__value = new_value
-        
+    
+    def validator(self, value):
+        pass
+
+
 class Name(Field):
     def __init__(self, value) -> None:
         super().__init__(value)
@@ -36,7 +40,7 @@ class Phone(Field):
             
     def __repr__(self) -> str:
         return f"{self.value}"
-    
+
 class Birthday(Field):
     def __init__(self, value) -> None:
         super().__init__(value)
