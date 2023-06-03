@@ -1,6 +1,6 @@
 from collections import UserDict
 from re import match
-from datetime import datetime, date
+from datetime import datetime
 
 class Field:
     def __init__(self, value) -> None:
@@ -70,19 +70,50 @@ class Record:
     def remove_birthday(self):
         self.birthday = None
 
+    def is_leap_year(year):
+    # Перевіряємо, чи рік є високосним
+        if year % 4 == 0:
+            if year % 100 == 0:
+                if year % 400 == 0:
+                    return True
+                return False
+            return True
+        return False
+
     def days_to_birthday(self) -> int:
         if self.birthday is None:
             return 'please enter your date of birth'
         
-        today = date.today()
-        birthday = datetime.strptime(self.birthday, '%d-%m-%Y').date()
-        next_bd = date(today.year, birthday.month, birthday.day)
-        
-        if today > next_bd:
-            next_bd = date(today.year + 1, birthday.month, birthday.day)
+        # беремо поточну дату
+        current_date = datetime.now().date()
 
-        days_to_birthday = (next_bd - today).days
+        # перевірка на правильність дати
+        date_obj = datetime.strptime(self.birthday, '%d-%m-%Y').date()
+        
+        # перевірка на високосний рік
+        if (date_obj.month, date_obj.day) == (2, 29) and not self.is_leap_year(current_date.year):
+            date_obj = date_obj.replace(day=date_obj.day - 1)
+        birthday = date_obj.replace(year=current_date.year)
+        
+        if birthday < current_date:
+            birthday = birthday.replace(year=current_date.year + 1)
+        
+        days_to_birthday = (birthday - current_date).days
+        
         return days_to_birthday
+    
+    def get_upcoming_birthday(self, days):
+        current_date = datetime.now().date()
+
+        date_obj = datetime.strptime(self.birthday, '%d-%m-%Y').date()
+        birthday = date_obj.replace(year=current_date.year)
+        
+        if birthday < current_date:
+            birthday = birthday.replace(year=current_date.year + 1)
+        
+        if (birthday - current_date).days == days:
+            return f' have birhdai in {days} days'
+
 
     def add_phone(self, phone: Phone | str):
         if isinstance(phone, str):

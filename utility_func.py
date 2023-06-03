@@ -107,6 +107,14 @@ def days_to_birthday(name: str):
     result = record.days_to_birthday()
     return result
 
+def upcoming_birthday(days):
+    
+    record = CONTACTS.data
+    result = ''
+    for name, record in record.items():
+        result += f'{name}: {record.get_upcoming_birthday(int(days))}' 
+    return result
+
 @input_error
 def paginate(page_size: int) -> str:
     result = ''
